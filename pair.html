@@ -1,218 +1,510 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pair Code</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta name="theme-color" content="#0a0e17">
+  <title>Anonymous Pair Site</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: black;
-      font-family: Arial, sans-serif;
+    :root {
+      --primary: #00f7ff;
+      --secondary: #1e3a78;
+      --bg: #0a0e17;
+      --glass: rgba(255, 255, 255, 0.05);
+      --text: #ffffff;
+      --muted: #708090;
+      --highlight: #FF1493;
+      --radius: 16px;
+      --blur: 12px;
+      --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --glow: 0 0 15px rgba(0, 212, 255, 0.3);
     }
 
-    .container {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: white;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 80px 20px;
     }
 
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      overflow: hidden;
+      background: linear-gradient(45deg, var(--bg) 30%, rgba(10, 14, 23, 0.8));
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      mix-blend-mode: screen;
+      opacity: 0.15;
+    }
+
+    /* Header with logo */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-img {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      box-shadow: var(--glow);
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary), #00b4d8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: var(--glow);
+      animation: textFloat 3s ease-in-out infinite;
+    }
+
+    /* Battery indicator */
+    .battery-container {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .battery-icon {
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    /* Main container */
+    .main-content {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+      margin-top: 2rem;
+    }
+
+    /* Pairing box */
     .box {
-      width: 300px;
-      height: 320px;
-      padding: 20px;
-      position: relative;
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      border-radius: var(--radius);
+      padding: 2rem;
       text-align: center;
-      background-color: rgb(0, 0, 0);
-      opacity:0.8;
-      border-radius: 10px;
-      transform: perspective(1000px) rotateY(0deg);
-      box-shadow: 0 0 20px rgba(250, 249, 249, 0.7);
-      position: relative;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
     }
 
-    #text {
-      color: #f6f5f5;
+    .box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), var(--glow);
     }
 
-    .input-container input {
-      color: #f1eaea;
+    .box h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, var(--primary), #00b4d8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: var(--glow);
+      animation: textFloat 3s ease-in-out infinite;
     }
 
-    .centered-text {
-      color: #e9e4e4;
+    .box h5 {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-weight: normal;
     }
 
+    /* Input styling */
     .input-container {
       display: flex;
-      background: rgb(10, 10, 10);
-      border-radius: 1rem;
-      background: black;
-      box-shadow: black;
-      padding: 0.3rem;
-      gap: 0.3rem;
-      max-width: 300px;
-      width: 100%;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .input-container input {
-      border-radius: 0.8rem 0 0 0.8rem;
-      background: #e8e8e8;
-      box-shadow: inset 13px 13px 10px #dcdcdc, inset -13px -13px 10px #f4f4f4;
-      width: 100%;
-      flex-basis: 75%;
+      flex: 1;
       padding: 1rem;
-      border: none;
-      border-left: 2px solid #ecf2f8;
-      color: #000000;
-      transition: all 0.2s ease-in-out;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      font-family: inherit;
+      transition: var(--transition);
     }
 
     .input-container input:focus {
-      border-left: 2px solid #ecf1f6;
       outline: none;
-      box-shadow: inset 13px 13px 10px #f0f2f3, inset -13px -13px 10px #f4f4f4;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
     }
 
     .input-container button {
-      flex-basis: 15%;
-      padding: 1rem;
-      background: #5935ac;
-      font-weight: 700;
-      letter-spacing: 0.3rem;
-      text-transform: uppercase;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(45deg, var(--primary), #00b4d8);
       color: white;
       border: none;
-      width: 90%;
-      border-radius: 0 1rem 1rem 0;
-      transition: all 0.2s ease-in-out;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
     }
 
     .input-container button:hover {
-      background: linear-gradient(135deg, #c01736 0%, #8b17b6 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 247, 255, 0.3);
     }
 
-    @media (max-width: 500px) {
+    /* Result display */
+    #pair-result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #copy-code {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--primary);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      margin-top: 1rem;
+      display: none;
+    }
+
+    #copy-code:hover {
+      background: rgba(0, 212, 255, 0.1);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    }
+
+    /* Audio control */
+    .audio-control {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .audio-control:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.1);
+    }
+
+    /* Anonymous disclaimer */
+    .disclaimer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 500px;
+      padding: 0 1rem;
+    }
+
+    /* Animations */
+    @keyframes textFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .header {
+        padding: 0.8rem 1rem;
+      }
+      
+      .logo-text {
+        font-size: 1.2rem;
+      }
+      
+      body {
+        padding: 70px 15px;
+      }
+      
       .input-container {
         flex-direction: column;
       }
-
-      .input-container input {
-        border-radius: 0.8rem;
-      }
-
+      
       .input-container button {
-        padding: 0.4rem;
-        border-radius: 0.8rem;
+        width: 100%;
       }
-    }
-
-    .centered-text {
-      text-align: center;
-    }
-
-    @media (max-width: 500px) {
+      
       .box {
-        width: 90%; 
+        padding: 1.5rem;
       }
-    }
-
-    @media (max-width: 500px) {
-      .input-container input {
-        border-radius: 0.8rem;
-        width: 80%; 
-      }
-
-      .input-container button {
-        padding: 1rem;
-        border-radius: 0.9rem;
-        width: 100%; 
+      
+      .audio-control {
+        bottom: 1rem;
+        right: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-      <div class="box" id="box">
-        <div id="text">
-          <i class="fa fa-user"></i>
-          <p>
-            <h3 class="centered-text">ANONYMOUS-XMD PAIRING CODE</h3>
-            <br>
-            <h6>Terrizev</h6>
-            <h6>Enter Your Number with Country Code.</h6>
-            <div class="input-container">
-              <input placeholder="256xxx" type="number" id="number" placeholder="Enter your Phone Pumber with Country Code" name="">
-              <button id="submit">REQUEST CODE</button>
-            </div>
-            
-            <a id="waiting-message" class="centered-text" style="display: none;">Please wait a while</a>
-            <br>
-            <br>
-            <main id="pair"></main>
-          </p>
-        </div>
+  <!-- Video Background -->
+  <div class="video-container">
+    <video id="bg-video" autoplay loop playsinline>
+      <source src="https://files.catbox.moe/32acmd.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Audio Control -->
+  <div class="audio-control" id="audioControl">
+    <i class="fas fa-volume-mute"></i>
+  </div>
+
+  <!-- Header with Logo -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="https://files.catbox.moe/ttsedi.jpg" alt="Anonymous Logo" class="logo-img">
+      <div class="logo-text">ANONYMOUS PAIR</div>
+    </div>
+    
+    <!-- Battery Indicator -->
+    <div class="battery-container">
+      <i class="fas fa-battery-full battery-icon" id="battery-icon"></i>
+      <span id="battery-level">--%</span>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <div class="main-content">
+    <!-- Pairing Box -->
+    <div class="box">
+      <h2>SECURE PAIRING</h2>
+      <h5>ANONYMOUS CONNECTION</h5>
+      <p>Enter your number to generate a secure pairing code</p>
+      
+      <div class="input-container">
+        <input type="number" id="number" placeholder="Enter number (no country code)" required>
+        <button id="submit">GENERATE CODE</button>
       </div>
+      
+      <div id="pair-result">
+        <p id="waiting-message" style="display: none;">Generating secure code...</p>
+      </div>
+      
+      <button id="copy-code" onclick="copyCode()">COPY CODE</button>
+    </div>
+
+    <div class="disclaimer">
+      <p>This service provides completely anonymous pairing. No data is stored or logged.</p>
     </div>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let a = document.getElementById("pair");
-    let b = document.getElementById("submit");
-    let c = document.getElementById("number");
-    let box = document.getElementById("box");
+    // DOM elements
+    const pairResult = document.getElementById("pair-result");
+    const submitBtn = document.getElementById("submit");
+    const numberInput = document.getElementById("number");
+    const copyCodeBtn = document.getElementById("copy-code");
+    const waitingMessage = document.getElementById("waiting-message");
+    const batteryLevel = document.getElementById("battery-level");
+    const batteryIcon = document.getElementById("battery-icon");
+    const video = document.getElementById("bg-video");
+    const audioControl = document.getElementById("audioControl");
+    let isMuted = true;
 
-    async function Copy() {
-      let text = document.getElementById("copy").innerText;
-      let obj = document.getElementById("copy");
-      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
-      obj.innerText = "COPIED";
-      obj.style = "color:blue;font-weight:bold";
-      obj.size = "5";
-      setTimeout(() => {
-        obj.innerText = text;
-        obj.style = "color:white;font-weight-bold";
-        obj.size = "5";
-      }, 500);
+    // Initialize video muted
+    video.muted = true;
+
+    // Audio control functionality
+    audioControl.addEventListener('click', () => {
+      isMuted = !isMuted;
+      video.muted = isMuted;
+      
+      if (isMuted) {
+        audioControl.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      } else {
+        audioControl.innerHTML = '<i class="fas fa-volume-up"></i>';
+      }
+    });
+
+    // Copy code function
+    async function copyCode() {
+      const code = pairResult.innerText.replace('CODE: ', '');
+      try {
+        await navigator.clipboard.writeText(code);
+        copyCodeBtn.innerText = "COPIED!";
+        copyCodeBtn.style.backgroundColor = "#00ff00";
+        copyCodeBtn.style.color = "#000";
+        setTimeout(() => {
+          copyCodeBtn.innerText = "COPY CODE";
+          copyCodeBtn.style.backgroundColor = "";
+          copyCodeBtn.style.color = "";
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
     }
 
-    b.addEventListener("click", async (e) => {
+    // Submit handler
+    submitBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (!c.value) {
-        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
-      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
-        a.innerHTML = '<a style="color:green;font-weight:bold">Invalid Number</a><br><br>';
-      } else {
-        const Mbuvi_Tech = c.value.replace(/[^0-9]/g, "");
-        let bb = "";
-        let bbc = "";
-        const cc = Mbuvi_Tech.split('');
-        cc.map(a => {
-          bbc += a;
-          if (bbc.length == 3) {
-            bb += " " + a;
-          } else if (bbc.length == 8) {
-            bb += " " + a;
-          } else {
-            bb += a;
-          }
-        });
-        c.type = "text";
-        c.value = "+" + bb;
-        c.style = "color:black;font-size:20px";
-        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
-        let { data } = await axios(`/code?number=${Mbuvi_Tech}`);
-        let code = data.code || "Service Unavailable";
-        a.innerHTML = '<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">' + code + '</span></font><br><br><br>';
+      
+      if (!numberInput.value) {
+        pairResult.innerHTML = '<p style="color:var(--primary)">Please enter your number (without country code)</p>';
+        return;
       }
+      
+      const cleanNumber = numberInput.value.replace(/[^0-9]/g, "");
+      
+      if (cleanNumber.length < 11) {
+        pairResult.innerHTML = '<p style="color:#ff5555">Invalid number format</p>';
+        return;
+      }
+      
+      // Format number display
+      let formattedNumber = "";
+      const digits = cleanNumber.split('');
+      digits.forEach((digit, index) => {
+        formattedNumber += digit;
+        if (index === 2 || index === 7) {
+          formattedNumber += " ";
+        }
+      });
+      
+      numberInput.type = "text";
+      numberInput.value = "+" + formattedNumber;
+      numberInput.style.color = "var(--primary)";
+      
+      waitingMessage.style.display = "block";
+      pairResult.innerHTML = "";
+      copyCodeBtn.style.display = "none";
+      
+      try {
+        const { data } = await axios(`/code?number=${cleanNumber}`);
+        const code = data.code || "Service Unavailable";
+        
+        pairResult.innerHTML = `
+          <p style="color:var(--primary); font-weight:bold; font-size:1.2rem;">
+            CODE: <span style="color:white">${code}</span>
+          </p>
+        `;
+        copyCodeBtn.style.display = "inline-block";
+        waitingMessage.style.display = "none";
+      } catch (error) {
+        pairResult.innerHTML = '<p style="color:#ff5555">Error generating secure code</p>';
+        waitingMessage.style.display = "none";
+      }
+    });
+
+    // Battery status indicator
+    async function updateBattery() {
+      if (navigator.getBattery) {
+        try {
+          const battery = await navigator.getBattery();
+          
+          const updateBatteryUI = () => {
+            const batteryPercent = Math.round(battery.level * 100);
+            batteryLevel.textContent = `${batteryPercent}%`;
+            
+            // Update battery icon based on level
+            let iconClass = 'fa-battery-empty';
+            if (batteryPercent > 80) iconClass = 'fa-battery-full';
+            else if (batteryPercent > 60) iconClass = 'fa-battery-three-quarters';
+            else if (batteryPercent > 40) iconClass = 'fa-battery-half';
+            else if (batteryPercent > 20) iconClass = 'fa-battery-quarter';
+            
+            // Add charging bolt if charging
+            if (battery.charging) {
+              batteryIcon.className = `fas fa-bolt ${iconClass}`;
+              batteryIcon.style.color = '#00ff00';
+            } else {
+              batteryIcon.className = `fas ${iconClass}`;
+              batteryIcon.style.color = 'var(--primary)';
+            }
+          };
+          
+          battery.addEventListener('levelchange', updateBatteryUI);
+          battery.addEventListener('chargingchange', updateBatteryUI);
+          updateBatteryUI();
+        } catch (error) {
+          console.error('Battery API error:', error);
+        }
+      } else {
+        batteryLevel.textContent = "N/A";
+      }
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      copyCodeBtn.style.display = "none";
+      updateBattery();
+      
+      // Smooth page load
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+      }, 100);
     });
   </script>
 </body>
-                              </html>
-  
+</html>
