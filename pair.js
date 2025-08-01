@@ -6,7 +6,7 @@ const fs = require('fs');
 let router = express.Router();
 const pino = require('pino');
 const {
-    default: Mbuvi_Tech,
+    default: WhatsAppClient,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
@@ -22,10 +22,10 @@ router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
     
-    async function Mbuvi_MD_PAIR_CODE() {
+    async function generatePairCode() {
         const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
         try {
-            let Pair_Code_By_Mbuvi_Tech = Mbuvi_Tech({
+            let client = WhatsAppClient({
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }).child({ level: 'fatal' })),
@@ -35,26 +35,26 @@ router.get('/', async (req, res) => {
                 browser: Browsers.macOS('Chrome')
             });
 
-            if (!Pair_Code_By_Mbuvi_Tech.authState.creds.registered) {
+            if (!client.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
-                const code = await Pair_Code_By_Mbuvi_Tech.requestPairingCode(num);
+                const code = await client.requestPairingCode(num);
                 if (!res.headersSent) {
                     await res.send({ code });
                 }
             }
 
-            Pair_Code_By_Mbuvi_Tech.ev.on('creds.update', saveCreds);
-            Pair_Code_By_Mbuvi_Tech.ev.on('connection.update', async (s) => {
+            client.ev.on('creds.update', saveCreds);
+            client.ev.on('connection.update', async (s) => {
                 const { connection, lastDisconnect } = s;
                 if (connection === 'open') {
                     await delay(5000);
                     let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
                     await delay(800);
                     let b64data = Buffer.from(data).toString('base64');
-                    let session = await Pair_Code_By_Mbuvi_Tech.sendMessage(Pair_Code_By_Mbuvi_Tech.user.id, { text: 'Anonymous~' + b64data });
+                    let session = await client.sendMessage(client.user.id, { text: 'Anonymous~' + b64data });
 
-                    let Mbuvi_MD_TEXT = `
+                    let successMessage = `
         
 ╔════════════════════◇
 ║『 SESSION CONNECTED』
@@ -62,14 +62,14 @@ router.get('/', async (req, res) => {
 ║ ✨Terrivez🤓
 ╚════════════════════╝`;
 
-                    await Pair_Code_By_Mbuvi_Tech.sendMessage(Pair_Code_By_Mbuvi_Tech.user.id, { text: Toxic_MD_TEXT }, { quoted: session });
+                    await client.sendMessage(client.user.id, { text: successMessage }, { quoted: session });
 
                     await delay(100);
-                    await Pair_Code_By_Mbuvi_Tech.ws.close();
+                    await client.ws.close();
                     return await removeFile('./temp/' + id);
                 } else if (connection === 'close' && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
-                    Mbuvi_MD_PAIR_CODE();
+                    generatePairCode();
                 }
             });
         } catch (err) {
@@ -81,7 +81,7 @@ router.get('/', async (req, res) => {
         }
     }
     
-    return await Mbuvi_MD_PAIR_CODE();
+    return await generatePairCode();
 });
 
 module.exports = router;
